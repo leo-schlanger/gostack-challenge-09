@@ -30,10 +30,10 @@ class OrdersProducts {
   @Column()
   order_id: string;
 
-  @Column('number')
+  @Column('decimal', { precision: 7, scale: 2 })
   price: number;
 
-  @Column('decimal', { precision: 7, scale: 2 })
+  @Column('numeric')
   quantity: number;
 
   @CreateDateColumn()
