@@ -37,6 +37,10 @@ class CreateProductService {
       throw new AppError('Customer does not exists');
     }
 
+    if (products.length === 0) {
+      throw new AppError('Cannot create orders without products');
+    }
+
     const storedProducts = await this.productsRepository.findAllById(
       products.map(product => ({ id: product.id })),
     );
