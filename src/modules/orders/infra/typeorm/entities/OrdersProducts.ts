@@ -16,24 +16,24 @@ class OrdersProducts {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Order)
-  @JoinColumn({ name: 'order_id', referencedColumnName: 'id' })
-  order: Order;
-
-  @ManyToOne(() => Product)
-  @JoinColumn({ name: 'product_id', referencedColumnName: 'id' })
-  product: Product;
-
   @Column()
   product_id: string;
 
   @Column()
   order_id: string;
 
-  @Column('decimal', { precision: 7, scale: 2 })
+  @ManyToOne(() => Order, { eager: true })
+  @JoinColumn({ name: 'order_id' })
+  order: Order;
+
+  @ManyToOne(() => Product, { eager: true })
+  @JoinColumn({ name: 'product_id' })
+  product: Product;
+
+  @Column()
   price: number;
 
-  @Column('numeric')
+  @Column()
   quantity: number;
 
   @CreateDateColumn()

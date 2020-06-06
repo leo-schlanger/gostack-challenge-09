@@ -5,7 +5,7 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export default class CreateOrders1589419189186 implements MigrationInterface {
+export default class CreateOrders1589683650458 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
@@ -15,7 +15,6 @@ export default class CreateOrders1589419189186 implements MigrationInterface {
             name: 'id',
             type: 'uuid',
             isPrimary: true,
-            isGenerated: true,
             generationStrategy: 'uuid',
             default: 'uuid_generate_v4()',
           },
@@ -41,7 +40,7 @@ export default class CreateOrders1589419189186 implements MigrationInterface {
     await queryRunner.createForeignKey(
       'orders',
       new TableForeignKey({
-        name: 'CustomerOrder',
+        name: 'customerForignKey',
         columnNames: ['customer_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'customers',
@@ -52,7 +51,8 @@ export default class CreateOrders1589419189186 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('orders', 'CustomerOrder');
+    await queryRunner.dropForeignKey('orders', 'customerForeignKey');
+
     await queryRunner.dropTable('orders');
   }
 }

@@ -10,6 +10,7 @@ import IOrdersRepository from '../repositories/IOrdersRepository';
 interface IProduct {
   id: string;
   quantity: number;
+  name?: string;
 }
 
 interface IRequest {
@@ -34,54 +35,32 @@ class CreateProductService {
     const customer = await this.customersRepository.findById(customer_id);
 
     if (!customer) {
-      throw new AppError('Customer does not exists');
+      throw new AppError('Customer not exists');
     }
 
-    if (products.length === 0) {
-      throw new AppError('Cannot create orders without products');
-    }
-
-    const storedProducts = await this.productsRepository.findAllById(
-      products.map(product => ({ id: product.id })),
-    );
-
-    if (storedProducts.length !== products.length) {
-      throw new AppError(
-        'One or more products requested does not exists on database',
-      );
-    }
-
-    const outOfStock = products.filter(product => {
-      const storedProduct = storedProducts.find(
-        findProduct => findProduct.id === product.id,
-      );
-
-      return (
-        storedProduct &&
-        storedProduct.id === product.id &&
-        storedProduct.quantity - product.quantity < 0
-      );
+    const productsArrayId = products.map(product => {
+      return { id: product.id };
     });
 
-    if (outOfStock.length > 0) {
-      throw new AppError('Some of ordered products are out of stock');
-    }
+    const allProducts = await this.productsRepository.findAllById(
+      productsArrayId,
+    );
 
-    const orderedProducts = storedProducts.map(storedProduct => {
-      const productIndex = products.findIndex(
-        product => product.id === storedProduct.id,
+    const orderProducts = allProducts.map(product => {
+      const cart = products.find(
+        correctProdut => correctProdut.id === product.id,
       );
 
       return {
-        product_id: storedProduct.id,
-        price: storedProduct.price,
-        quantity: products[productIndex].quantity,
+        product_id: product.id,
+        price: product.price,
+        quantity: cart?.quantity || 0,
       };
     });
 
     const order = await this.ordersRepository.create({
       customer,
-      products: orderedProducts,
+      products: orderProducts,
     });
 
     await this.productsRepository.updateQuantity(products);
